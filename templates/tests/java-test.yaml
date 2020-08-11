@@ -1,0 +1,32 @@
+{{- if .Values.helmTest }}
+{{- $serviceName := include "java-helm-test.fullname" . -}}
+{{- $webServicePort := .Values.service.webPort -}}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ .Release.Name }}-java-test"
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: {{ .Release.Name }}-java-test
+      image: openjdk:11.0.8-jdk
+      imagePullPolicy: IfNotPresent
+      command: ["/bin/bash", "-c"]
+      args: ["cd /tmp; java -version; cat HelmTest.java; java -ea ./HelmTest.java $SERVICE"]
+      env:
+        - name: SERVICE
+          value: "http://{{ $serviceName }}.{{ .Release.Namespace }}.svc.cluster.local"
+      volumeMounts:
+        - name: tests
+          mountPath: "/tmp"
+          readOnly: true
+  restartPolicy: Never
+  volumes:
+    - name: tests
+      configMap:
+        name: {{ .Release.Name }}-test-configmap
+        items:
+          - key: "helmTestJava"
+            path: "HelmTest.java"
+  {{- end }}

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+  labels:
+    {{- include "java-helm-test.labels" . | nindent 4 }}
+data:
+  config.yaml: |-
+    someconfig: enabled
+

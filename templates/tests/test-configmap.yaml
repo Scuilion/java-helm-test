@@ -1,0 +1,11 @@
+{{- if .Values.helmTest }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-test-configmap
+  labels:
+    {{- include "java-helm-test.labels" . | nindent 4 }}
+data:
+  helmTestJava:
+    {{ .Values.helmTest | quote }}
+{{- end }}
